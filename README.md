@@ -260,3 +260,23 @@ docker run -d --name db-mongo -v /platzi/docker/dockerdata/mongodata:/data/db mo
 * ```-v```: Con este flag indicamos que haremos un **Bind mounts**, le pasamos dos parámetros separados por los dos puntos, el que esta en la parte izquierda indica el directorio de la maquina anfitriona que vamos a montar, el del lado derecho es el directorio donde se va a montar.
 
 Con esto tendremos persistencia de datos, aunque borremos el contenedor todo los datos quedaran grabados en el directorio montado de la maquina anfitriona, después si queremos ver los datos creamos un contenedor montando este directorio así seguiremos con nuestros datos.
+
+
+
+## Volúmenes
+
+Docker nos ofrece otras maneras de manejar datos distinto a **Bind mounts**, estos son los volúmenes que docker desarrollo para darle mas seguridad a los archivos y directorios.
+
+La parte de los volúmenes en el disco lo maneja exclusivamente docker a  menos que seamos usuarios privilegiados. Esto es mas practico a la hora de disponer un lugar donde docker va almacenar  los datos y que nadie puede tocar excepto docker, esto nos ayuda a ser mas ordenados.
+
+* ```docker volume ls```: Para ver si tenemos volúmenes en docker.
+* ```docker volume create db-mongo```: Creamos un volumen.
+
+Ahora creamos un contenedor y montamos este volumen.
+
+```dockerfile
+docker run -d --name db-mongo --mount src=db-mongo,dst=/data/db mongo
+```
+
+* ```--mount```: Con este flag indicamos que vamos a montar un volumen, este necesita dos parámetros que le indicamos uno con ```src``` que es el nombre del volumen a montar si este  no esta creado docker lo crea por nosotros, el otro parámetro lo indicamos con ```dst``` este es donde vamos a montar el volumen dentro de nuestro contenedor. estos los parámetros los separamos por una coma ```(,)```.
+
