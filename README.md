@@ -1,3 +1,5 @@
+
+
 # Docker
 
 
@@ -280,3 +282,42 @@ docker run -d --name db-mongo --mount src=db-mongo,dst=/data/db mongo
 
 * ```--mount```: Con este flag indicamos que vamos a montar un volumen, este necesita dos parámetros que le indicamos uno con ```src``` que es el nombre del volumen a montar si este  no esta creado docker lo crea por nosotros, el otro parámetro lo indicamos con ```dst``` este es donde vamos a montar el volumen dentro de nuestro contenedor. estos los parámetros los separamos por una coma ```(,)```.
 
+
+
+## Insertar y extraer archivos de un contenedor
+
+Podemos extraer e insertar archivos desde la maquina local a un contenedor.
+
+```dockerfile
+docker cp prueba.txt copytest:/testing/test.txt
+```
+
+
+
+* ```cp```: Flag con el que copiamos un archivo a un contenedor con los siguientes parámetros: Seguido del flag **cp** indicamos el nombre o ruta del archivo a copiar, después indicamos el nombre del contenedor donde se copiara, dos puntos ```(:)``` seguido de la ruta interna del contenedor donde se copiara el archivo.
+
+Con esto copiamos un archivo de nuestro sistema a un contenedor.
+
+Si se requiere realiza la operación contraria lo que debemos de realizar es invertir los parámetros del flag **cp**. Esto significa  que el primer  parámetro  es lo que vamos a copiar y el del lado derecho a donde lo vamos a copiar.
+
+```dockerfile
+docker cp copytest:/testing localtesting
+```
+
+
+
+
+
+Docker nos permite interactuar de maneras distintas con los archivos de la maquina local, con **Bind mounts** montamos un directorio especifico en un lugar especifico dentro del contenedor, este método tiene un defecto y es que solo podemos ver la información si creamos un contenedor montamos el directorio y accedemos al contenedor.
+
+
+
+Otra manera mas segura es crear volúmenes en docker y luego este volumen se monta a un contenedor. Este método es mas seguro porque el volumen solo lo puede manejar docker o usuarios con permisos privilegiados.
+
+También contamos con el flag **cp** que nos permite copiar archivos o directorios de la maquina local al interior de un contenedor o viceversa.
+
+Hay otra opción llama ```tmpfs```, este método solo esta disponible en sistemas linux, este es una porción de disco que esta disponible solo en memoria dentro del contenedor. Este información se borra en cuanto el contenedor se borra.
+
+
+
+![1_bo6IOrBjaHbtkPgTKT08NA](./recursos/1_bo6IOrBjaHbtkPgTKT08NA.png)
