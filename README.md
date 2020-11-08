@@ -239,6 +239,24 @@ docker run --name proxy -p 8080:80 ngnix
 
 	*	```-p 8080:80```: Es la abreviación de **publish**, el argumento para este flag se divide en dos separado por los dos puntos, el lado izquierdo es el puerto donde estará expuesto el servicio en la maquina anfitriona, la parte derecha es el puerto que se va a exponer del contenedor.
 
-Este servicio corre el background, si queremos ver los logs de este servicio usamos el comando ```docker logs proxy```, si necesitamos seguir los logs en tiempo real usamos ```docker logs -f proxy```, con este hacemos follow al servicio.
+Este servicio corre en background, si queremos ver los logs de este servicio usamos el comando ```docker logs proxy```, si necesitamos seguir los logs en tiempo real usamos ```docker logs -f proxy```, con este hacemos follow al servicio.
 
 En caso que necesitamos solo una cierta cantidad de últimos logs usamos el flag --tail de la siguiente manera: ```docker logs --tail 10 -f proxy```, con eso vemos solo los últimos 10 logs del servicio.
+
+
+
+## Bind mounts
+
+Los contenedores son autocontenidos, no pueden acceder a otros contenedores ni a la máquina anfitriona a menos que se lo permitamos.
+
+Si borramos un contenedor la información no se conserva, eso no es muy útil para eso hacemos lo siguiente.
+
+Creamos el directorio que queremos montar en el contenedor ```mkdir mongodata```
+
+```shell
+docker run -d --name db-mongo -v /platzi/docker/dockerdata/mongodata:/data/db mongo
+```
+
+* ```-v```: Con este flag indicamos que haremos un **Bind mounts**, le pasamos dos parámetros separados por los dos puntos, el que esta en la parte izquierda indica el directorio de la maquina anfitriona que vamos a montar, el del lado derecho es el directorio donde se va a montar.
+
+Con esto tendremos persistencia de datos, aunque borremos el contenedor todo los datos quedaran grabados en el directorio montado de la maquina anfitriona, después si queremos ver los datos creamos un contenedor montando este directorio así seguiremos con nuestros datos.
