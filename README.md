@@ -1,9 +1,3 @@
-
-
-# Docker
-
-
-
 ## Problemas del desarrollo de software profesional
 
 
@@ -321,3 +315,134 @@ Hay otra opción llama ```tmpfs```, este método solo esta disponible en sistema
 
 
 ![1_bo6IOrBjaHbtkPgTKT08NA](./recursos/1_bo6IOrBjaHbtkPgTKT08NA.png)
+
+
+
+
+
+## Conceptos fundamentales de Docker: Imágenes
+
+Las imagenes son los moldes o schemas a partir del cual Docker crea los contenedores.
+
+Para ver las imagenes que tenemos en local, tecleamos
+
+```dockerfile
+docker image ls
+```
+
+Una imagen es un conjunto de archivos o capas. Esto es para distribuir con eficiencia entre los distintos sistemas operativos la imagen.
+
+Para descargar una imagen a nuestro computador usamos ```docker pull <nombre_imagen>```, si no indicamos la versión especifica de la imagen Docker asume que requerimos la ultima versión.
+
+Si necesitamos una versión especifica de una imagen usamos la siguiente sintaxis: ```docker pull ubuntu:20.04```. Separamos con los dos puntos ```(:)``` el nombre de la imagen y la version de la imagen que requerimos.
+
+
+
+## Construyendo una imagen propia
+
+Creamos un archivo ```Dockerfile```, luego configuramos nuestra imagen en el archivo creado anteriormente.
+
+```dockerfile
+FROM ubuntu:latest
+
+RUN touch /usr/src/hola-platzi:txt
+```
+
+* ```FROM```: Indicamos de que imagen va a depender nuestra imagen personalizada.
+* ```RUN```: Es lo que va a realizar nuestra imagen.
+
+En este caso la imagen creada un archivo con el comando ``touch`` en la dirección que le pasemos, todo lo que indiquemos que hará la imaginen este lo hará en tiempo de build.
+
+Ya escrito la configuracion de la imagen ejecutamos o corremos el build:
+
+```dockerfile
+docker build -t ubuntu:platzi .
+```
+
+```build```: Comando con el que se crea la imagen.
+
+```-t```: Flag con el que le agregamos una etiqueta o nombre a nuestra imagen.
+
+Luego le pasamos el contexto del **build**, este es el espacio de disco que tendrá acceso docker a la hora de realizar el build. En este caso le pasamos el punto **(.)** que representa el directorio donde nos encontramos, ahí encuentra el archivo ```Dockerfile``` el que utilizara para crear la imagen.
+
+
+
+## El sistema de capas
+
+Para poder observar las capas con las cuales esta formado una imagen podemos utilizar el comando ```docker history <imagen>```, con esto veremos las capas de la imagen, esto es un poco limitado si requerimos ver las capas de modo más profundo podemos utilizar la herramienta ```dive``` que lo podemos encontrar en [dive](https://github.com/wagoodman/dive).
+
+Lo usamos desde la terminal con el comando ```dive <imagen>```, nos abre una ventana en la terminal mostrándonos todas las capas que tiene la imagen, una capa no es más que un cambio que realiza en la imagen.
+
+
+
+## Docker networking: colaboración entre contenedores
+
+
+
+Docker nos permite crear networking entre contenedores, para poder ver las redes que Docker ya nos ofrece podemos usar el comando ```docker network ls```.
+
+Podemos crear nuestra propia red de la siguiente manera. ```docker network create --attachable <nameNetwork>```:
+
+	*	```network```: Palabra clave para las networking.
+	*	```create```: Flag con el que creamos una nueva red.
+	*	```--attachable```: Flag con el que le decimos a docker que se pueden conectar desde otros contenedores al nuestro.
+
+Para ver las propiedades de la red creada podemos usar ```docker network inspect <nameNetwork>```.
+
+Para conectar un contenedor a la red creada anteriormente, usamos la siguiente sintaxis ```docker network connect <nameNetwork> <nameContainer>```.
+
+
+
+## Docker compose: la herramienta todo en uno
+
+Este es un archivo donde podemos escribir la arquitectura de servicios que nuestra app utilizara, configurar como se va a comunicar o manejar archivos.
+
+Este es un ejemplo de como se ve este archivo.
+
+```yaml
+version: "3.8"
+
+services:
+	app:
+ 		image: platziapp
+ 		environment:
+  			MONGO_URL: "mongodb://db:27017/db-mongo"
+ 		depends_on:                        
+			- db-mongo
+		ports:
+			- "3000:3000"
+ 
+ 	db:
+ 		image: mongo
+        
+```
+
+	*	```version```: Es la version del docker file, es necesario indicar la versión porque podria no soportar algunas características más recientes.
+	*	```services```: Son los servicios que componen a nuestra aplicación pensando en los micro-servicios.
+	*	```app```: Indica un servicio que es el que levanta nuestra aplicación.
+ *	```image```: Es la imagen del cual depende nuestra app.
+ *	```environment```: Indica las variables de entorno que necesita la app para funcionar.
+ *	```depends_on```: Indicamos de que otro contenedor depende este mismo, e indica que primero se debe de levantar el contenedor del cual depende de lo contrario no levanta nuestra app.
+ *	```ports```: Indicamos en que puerto sera expuesto nuestra app.
+
+
+
+Para correr o levantar la app tomando nuestro docker file corremos el siguiente comando ```docker-compose up```.
+
+
+
+### Comandos de docker-compose
+
+* ```docker-compose ps```: Lista los contenedores creados con docker-compose.
+* ```docker  network ls```: Lista las redes de docker.
+* ```docker network inspect docker_default```: Veo definición de la red.
+* ```docker-compose logs```:  Veo todos los logs
+* ```docker-compose logs app```: Podemos ver los logs de app.
+* ```docker-compose logs -f app```: Con el flag ``-f`` hacemos follow de los logs de la app.
+* ```docker-compose exec app bash```: Entro al shell del contenedor app. En este caso no es necesario agregar el flag ``-it`` para ingresar al shell, esto es porque se esta utilizando docker-compose.
+* ```docker-compose down```: Para detener los contenedores y destruirlos. También elimina la red.
+
+
+
+### Docker compose, como herramienta de desarrollo
+
