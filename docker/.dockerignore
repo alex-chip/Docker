@@ -2,6 +2,7 @@
 .dockerignore
 .git
 .gitignore
+docker-compose.yml
 build/*
 Dockerfile
 node_modules

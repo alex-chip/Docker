@@ -446,3 +446,73 @@ Para correr o levantar la app tomando nuestro docker file corremos el siguiente 
 
 ### Docker compose, como herramienta de desarrollo
 
+
+
+## Administrando el ambiente de Docker
+
+* ```docker container prune```: Nos ayuda a borrar todos los contenedores que están apagados.
+* ```docker ps -q```: Muestra el **id** de los contenedores que están corriendo.
+* ```docker rm -f $(docker ps -aq)```:  Con esto borramos a la fuerza todos los contenedores que están corriendo.
+* ```docker system prune```:  Con esto docker limpia todo lo que no esta en uso.
+* ```docker run -d --name app --memory 1g platziapp```: Creamos un contenedor con el flag ***--memory*** y su argumento de ***1g***. con esto limitamos el uso de memoria de este contenedor.
+* ```docker stats```:  Con esto vemos el uso de memoria que esta usando docker y los diferentes contenedores que están corriendo.
+
+## Detener contenedores correctamente: SHELL vs. EXEC
+
+* ```docker stop looper```: Docker envía la señal ***SIGTERM*** para detener el contenedor con el nombre looper.
+
+* ```docker ps -l```: Con el flag ***-l*** ***(latest)***, con este indicamos que nos muestre es estado del ultimo proceso, este o no este corriendo.
+
+  Cuando tengamos un código de salida mayor a 128 es porque Docker forzó la detención del contenedor.
+
+* ```docker kill looper```: Docker envía la señal ***SIGKILL***, para forzar la detención del contenedor.
+
+* ```docker exec looper ps -ef```: Vemos los procesos del contenedor.
+
+Es mas eficiente escribir nuestro Dockerfile con el método ***EXEC*** que con el método ***SHELL***, para escribirlo con el método ***EXEC*** escribimos las sentencias entre corchetes y dobles comillas **ejemplo** ```CMD ["/loop.sh"]```. De esta manera nos aseguramos correr de manera independiente los procesos y no que dependa de otro.
+
+## Contenedores ejecutables: ENTRYPOINT vs CMD
+
+Para poder pasarle parámetros al correr un contenedor y este ejecute el mismo debemos de utilizar una utilizar que se llama ***ENTRYPOINT*** en nuestro Dockerfile.
+
+```dockerfile
+FROM ubuntu:trusty
+ENTRYPOINT ["/bin/ping", "-c", "3"]
+CMD ["localhost"]
+```
+
+Con esto podemos pasarle un parámetro a nuestro contenedor. ```docker run --name pinger ping google.com```.
+
+## El contexto de build
+
+El contexto de build se lo pasamos como ultimo parámetro al comando a la hora de realizar el build  de un archivo Dockerfile. ```docker build -t prueba .``` En este caso le pasamos como parámetro el punto ***.*** que representa la carpeta actual o donde nos encontramos. Esto puede causarnos algunos inconvenientes si tenemos archivos o carpetas muy pesadas, para evitar esto podemos crear un archivo llamado ***.dockerignore***, en este archivo especificamos los archivos o carpetas que no queremos que de copien a nuestra imagen.
+
+```dockerfile
+*.log
+.dockerignore
+node_modules
+.git
+npm-debug.log*
+README.md
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
